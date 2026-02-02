@@ -1,0 +1,149 @@
+#include "urls.h"
+#include "esp_log.h"
+#include <string.h>
+#include <stdio.h>
+
+
+static const char *TAG = "SERVER";
+
+#define WS_MAX_SIZE 1024
+static int client_session_id;
+esp_err_t send_ws_message(char* message)
+{
+  //error if there is no client id
+  if(!client_session_id)
+  {
+    ESP_LOGE(TAG, "no client id");
+    return -1;
+  }
+  //message config
+  httpd_ws_frame_t ws_message = {
+    .final = true,
+    .fragmented = false,
+    .len = strlen(message),
+    .payload = (uint8_t *)message,
+    .type = HTTPD_WS_TYPE_TEXT
+
+  };
+  httpd_ws_send_frame_async(server, client_session_id, &ws_message);
+  return 1;
+}
+
+//websocket url callback
+esp_err_t on_WEB_SOCKET_url(httpd_req_t *req)
+{
+  client_session_id = httpd_req_to_sockfd(req);
+  if(req->method == HTTP_GET) return ESP_OK;
+  
+  httpd_ws_frame_t ws_pkt;
+  memset(&ws_pkt,0,sizeof(httpd_ws_frame_t)); //reset/clean memory on ws.pkt address
+  ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+  ws_pkt.payload = malloc(WS_MAX_SIZE);         //create our own heap memory
+  httpd_ws_recv_frame(req,&ws_pkt,WS_MAX_SIZE);   //copy memory 
+  printf("ws payload: %.*s\n", ws_pkt.len, ws_pkt.payload);     //1. length to print 2. start index pointer 
+  free(ws_pkt.payload);   //free memory
+
+  char* response = "{\"status\":\"connected OK\"}";   //response to websocket client
+  httpd_ws_frame_t ws_response = {
+    .final = true,
+    .fragmented = false,
+    .type = HTTPD_WS_TYPE_TEXT,
+    .payload = (uint8_t *)response,
+    .len = strlen(response), 
+  };
+  return httpd_ws_send_frame(req, &ws_response);
+  
+}
+
+
+
+
+esp_err_t on_default_url(httpd_req_t *req)    
+{                                                     //http home url page
+    ESP_LOGI(TAG,"URL: %s",req->uri);
+
+    char path[600];
+    sprintf(path, "/store%s", req->uri);      //write a string inside a variable
+
+    //******************    setup mimes    *******************************
+
+
+    char* ext = strrchr(req -> uri, '.');
+    if(ext)
+    {
+      if(strcmp(ext,".css") == 0) httpd_resp_set_type(req,"text/css");
+      if(strcmp(ext,".js") == 0) httpd_resp_set_type(req,"text/javascript");
+      if(strcmp(ext,".png") == 0) httpd_resp_set_type(req,"image/png");
+      if(strcmp(ext,".jpg") == 0) httpd_resp_set_type(req,"image/jpg");
+      if(strcmp(ext,".svg") == 0) httpd_resp_set_type(req,"image/svg+xml");
+    };
+
+    //******************************************************************** 
+    FILE *file = fopen(path, "r"); 
+    //if path does not exist                   
+    if(file == NULL)
+    {
+      file = fopen("/store/index.html", "r");    //open index page
+      if(file == NULL)
+      {
+        httpd_resp_send_404(req);   //send error 404
+      }
+      ESP_LOGI(TAG, "STORE/INDEX.HTML NOT FOUND");
+    }
+    char buffer[1024];
+    int bytes_read = 0;
+    while((bytes_read = fread(buffer, sizeof(char), sizeof(buffer),file)) > 0)   //read the file, end file
+                                                                                 //when byres_read is 0
+    {
+      httpd_resp_send_chunk(req, buffer, bytes_read); //send response while buffer is filled with file data
+    }
+    fclose(file);   //close file
+    httpd_resp_send_chunk(req, NULL, 0); //empty http data chunk
+
+    
+    return ESP_OK;
+}
+
+esp_err_t on_disable_mode_url(httpd_req_t *req)
+ {
+  mode = 0;
+  printf("mode is: %d\n",mode);
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,0);                      //send http status
+  return ESP_OK;
+ }
+esp_err_t on_auto_mode_url(httpd_req_t *req)
+ {
+  mode = 1;
+  printf("mode is: %d\n",mode);
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,0);                      //send http status
+  return ESP_OK;
+ };
+esp_err_t on_error_mode_url(httpd_req_t *req)
+ {
+  mode = 2;
+  printf("mode is: %d\n",mode);
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,0);                      //send http status
+  return ESP_OK;
+ };
+esp_err_t on_pedestrian_call_mode_url(httpd_req_t *req)
+ {
+  mode = 3;
+  green_led_on();
+  printf("mode is: %d\n",mode);
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,0);                      //send http status
+  return ESP_OK;
+ };
+
+  esp_err_t on_text_url(httpd_req_t *req)
+ {
+  char mode_str[16];
+  snprintf(mode_str, sizeof(mode_str), "%d", mode);   //  int to string
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,strlen(mode_str));                      //send http status
+  return ESP_OK;
+ };
+

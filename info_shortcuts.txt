@@ -1,0 +1,65 @@
+to let vscode detect the changes you need to save (ctrl + s)
+
+git status = print tracked and untracked files
+git add . = add changes to staged memory
+git commit -m "*msg*" = commit with a message
+git push origin main = push committed changes to repository
+git pull origin main = update code from repo
+
+git push --force origin main = push code ignoring git warning
+
+git fetch origin
+git reset --hard origin/main   = pull code ignoring git warning and deleting changes
+
+
+////////
+JSON OBJECT PARSE = shift + alt + F
+
+/////web server
+npm create vite@latest
+cd site
+npm install
+npm run build
+npm run dev
+
+//add partition:
+# Name,   Type, SubType, Offset,  Size, Flags
+nvs,      data, nvs,     ,        0x6000,
+phy_init, data, phy,     ,        0x1000,
+factory,  app,  factory, ,        1M,
+storage,  data, fat, ,         2M 
+
+configure menuconfig with
+
+the new partition table
+ensure flash size is correct
+allow FAT long file names
+
+in main/CMakeLists add:
+fatfs_create_rawflash_image(storage ../site/dist FLASH_IN_PROJECT)
+
+
+to make change in frontend:
+esp idf terminal
+cd site
+npm run build
+build flash monitor
+
+//directories and file scope
+
+components
+-folder
+    -file.c     #include "file.h"
+    -file.h     -headers ifndef define endif
+    -CMakeLists 
+        idf_component_register(SRCS  
+                        "file.c" 
+                    INCLUDE_DIRS 
+                        "."
+                    REQUIRES 
+                        *driver*
+           
+                 )
+
+
+
