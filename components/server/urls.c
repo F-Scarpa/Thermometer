@@ -6,6 +6,7 @@
 
 static const char *TAG = "SERVER";
 
+//------------------------websocket------------------------//
 #define WS_MAX_SIZE 1024
 static int client_session_id;
 esp_err_t send_ws_message(char* message)
@@ -54,10 +55,10 @@ esp_err_t on_WEB_SOCKET_url(httpd_req_t *req)
   return httpd_ws_send_frame(req, &ws_response);
   
 }
+//------------------------websocket------------------------//
 
 
-
-
+//-----------------------default url-----------------------//
 esp_err_t on_default_url(httpd_req_t *req)    
 {                                                     //http home url page
     ESP_LOGI(TAG,"URL: %s",req->uri);
@@ -104,46 +105,17 @@ esp_err_t on_default_url(httpd_req_t *req)
     return ESP_OK;
 }
 
+//-----------------------default url-----------------------//
+
+//what happen when on_disable_mode_url is visited/called
 esp_err_t on_disable_mode_url(httpd_req_t *req)
  {
-  mode = 0;
-  printf("mode is: %d\n",mode);
+  //mode = 0;
+  //printf("mode is: %d\n",mode);
   httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
   httpd_resp_send(req,NULL,0);                      //send http status
   return ESP_OK;
  }
-esp_err_t on_auto_mode_url(httpd_req_t *req)
- {
-  mode = 1;
-  printf("mode is: %d\n",mode);
-  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
-  httpd_resp_send(req,NULL,0);                      //send http status
-  return ESP_OK;
- };
-esp_err_t on_error_mode_url(httpd_req_t *req)
- {
-  mode = 2;
-  printf("mode is: %d\n",mode);
-  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
-  httpd_resp_send(req,NULL,0);                      //send http status
-  return ESP_OK;
- };
-esp_err_t on_pedestrian_call_mode_url(httpd_req_t *req)
- {
-  mode = 3;
-  green_led_on();
-  printf("mode is: %d\n",mode);
-  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
-  httpd_resp_send(req,NULL,0);                      //send http status
-  return ESP_OK;
- };
 
-  esp_err_t on_text_url(httpd_req_t *req)
- {
-  char mode_str[16];
-  snprintf(mode_str, sizeof(mode_str), "%d", mode);   //  int to string
-  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
-  httpd_resp_send(req,NULL,strlen(mode_str));                      //send http status
-  return ESP_OK;
- };
+ 
 

@@ -11,6 +11,8 @@ git push --force origin main = push code ignoring git warning
 git fetch origin
 git reset --hard origin/main   = pull code ignoring git warning and deleting changes
 
+//libraries
+>F1 > show component registry
 
 ////////
 JSON OBJECT PARSE = shift + alt + F

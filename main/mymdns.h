@@ -5,7 +5,7 @@
 void start_mdns_service()
 {
   mdns_init();
-  mdns_hostname_set("tra-lig");    //create our name for server, set the host  type hostname.local
+  mdns_hostname_set("thermo");    //create our name for server, set the host  type hostname.local
   mdns_instance_name_set("LEARN esp32 thing");
 }
 

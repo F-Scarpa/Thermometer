@@ -1,8 +1,12 @@
 idf_component_register(SRCS  
                         "traffic_light.c" 
+                        "dht_read.c"
                     INCLUDE_DIRS 
                         "."
                     REQUIRES 
-                        driver freertos pinsSetup
+                        driver 
+                        freertos 
+                        pinsSetup
+                        dht
            
                  )

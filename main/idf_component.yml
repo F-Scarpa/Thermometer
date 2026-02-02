@@ -15,3 +15,4 @@ dependencies:
   #   # All dependencies of `main` are public by default.
   #   public: true
   espressif/mdns: ^1.9.1
+  esp-idf-lib/dht: ^1.2.0

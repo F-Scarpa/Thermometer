@@ -5,12 +5,17 @@
 #include "driver/gpio.h"  
 #include "pinsSetup.h"
 
+
+/*
+//task logic
 void traffic_light_cycle(void *pvparams)            //void * is a generic pointer, it can be casted to anything
 {
-    (void) pvparams;        
+    (void) pvparams;        //when dont use parameter
 
-    LedTaskParams params = {.delayTime = 2000};       
-    int cycle_flag = 0;
+    LedTaskParams params = {.delayTime = 2000};  //create object from struct and customize values
+
+    //task "global" variables
+    int cycle_flag = 0;     
     
     while(1)            //in the task we always need while loop otherwise the program will crash
     {
@@ -40,22 +45,4 @@ void traffic_light_cycle(void *pvparams)            //void * is a generic pointe
     
     }
 }
-
-void traffic_light_error(void *pvparams)
-{
-    (void) pvparams;        //ignore pvparmas
-
-    LedTaskParams params = {.delayTime = 500};      //create value for a struct filed from inside the task
-    while(1)
-    {
-    yellow_led_on();
-    vTaskDelay(pdMS_TO_TICKS(params.delayTime));
-    yellow_led_off();
-    vTaskDelay(pdMS_TO_TICKS(params.delayTime));
-    }
-}
-
-void traffic_light_disable(void *pvparams)
-{
-    all_led_off();
-};
+*/
