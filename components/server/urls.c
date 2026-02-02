@@ -11,7 +11,7 @@ static const char *TAG = "SERVER";
 static int client_session_id;
 esp_err_t send_ws_message(char* message)
 {
-  //error if there is no client id
+  //error if websocket isn't connected on the frontend
   if(!client_session_id)
   {
     ESP_LOGE(TAG, "no client id");
@@ -44,7 +44,7 @@ esp_err_t on_WEB_SOCKET_url(httpd_req_t *req)
   printf("ws payload: %.*s\n", ws_pkt.len, ws_pkt.payload);     //1. length to print 2. start index pointer 
   free(ws_pkt.payload);   //free memory
 
-  char* response = "{\"status\":\"connected OK\"}";   //response to websocket client
+  char* response = "{\"status\":\"connected OK\"}";   //response to a successfully connected websocket
   httpd_ws_frame_t ws_response = {
     .final = true,
     .fragmented = false,
