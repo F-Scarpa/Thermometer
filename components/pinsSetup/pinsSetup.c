@@ -6,6 +6,7 @@
 
 
 //create JSONdata to send to websocket
+/*
 void send_JSON_num(int num)
 {
     static int previous_num = -1;
@@ -22,7 +23,7 @@ void send_JSON_num(int num)
         free(message); 
     }
 }
-
+*/
 //pinModes
 void pinsInit(){
     gpio_set_direction(redLed, GPIO_MODE_OUTPUT );

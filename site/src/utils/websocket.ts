@@ -1,18 +1,3 @@
-//import {useEffect} from 'react'
-
-import { timeEffects } from './effects'
-import { onLaunchEffects } from './onLaunch';
-import './App.css'
-
-
-function App() {
-  
-  //const [btnState, setBtnState] = useState(true);
-  //const [status, setStatus] = useState("pending...");
-  //const [colorNum, setColorNum] = useState(0);
-  const {currentTime, currentDate} = timeEffects();
-  onLaunchEffects();
-  /*
   const getWebSocketUrl = (suffix: string) =>
   {
     const l = window.location;
@@ -21,12 +6,12 @@ function App() {
 
   //server creates JSON object which will be read from the websocket
 
-  const webSocket = () => 
+  export const webSocket = () => 
   {
     const socket = new WebSocket(getWebSocketUrl("ws"));    //create new websocket
     socket.onopen = () =>        //on opened websocket
     {
-      socket.send("Hello esp32");
+      socket.send("Hello esp32");       //print on terminal when websocket successfully connects
     }
     socket.onmessage = (event) =>       //server send data to client
     {
@@ -50,39 +35,3 @@ function App() {
       console.log(event);
     }
   }
-    */
-
-/*
-  const disable_traffic_light = async () =>     
-  {                                                                         
-    const webResult = await fetch("/api/disable");  
-    console.log(webResult);
-    setStatus("Disabled")
-  }
-*/
-
-
-/*
-
-  useEffect(() => {
-    webSocket()
-  },[]);
-
-*/
-
-  
-
-
-  return (
-    <>
-      
-      <h2>Oggi: {currentDate}</h2>
-      <h2>Ora: {currentTime}</h2>
-     
-
-  
-    </>
-  )
-}
-
-export default App

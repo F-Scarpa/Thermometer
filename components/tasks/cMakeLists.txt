@@ -8,5 +8,6 @@ idf_component_register(SRCS
                         freertos 
                         pinsSetup
                         dht
+                        json
            
                  )
