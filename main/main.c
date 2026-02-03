@@ -18,6 +18,7 @@
 #include "pedestrian_call.h"   
 #include "pinsSetup.h"
 #include "dht_read.h"
+#include "motor_control.h"
 
 
 
@@ -27,6 +28,7 @@
 //task handlers
 //TaskHandle_t traffic_handle = NULL;
 TaskHandle_t dht_test_handle = NULL;
+TaskHandle_t motor_control_handle = NULL;
 
 /*
 if (traffic_handle)             //if task has been created delete it and reset value
@@ -47,8 +49,10 @@ if(traffic_handle == NULL)              //only create task if doesn't exist
 void app_main(void)
 {   
     
-    pinsInit();     //initialize pins
-    int_init();
+    //initializers
+    pinsInit();             //pins
+    pwm_init();             //pwm
+    int_init();             //interrupt
 
     //connect to wifi
     ESP_ERROR_CHECK(nvs_flash_init());
@@ -60,10 +64,17 @@ void app_main(void)
     mount_fs();   
     init_server();
 
+    
+    //motorControl();
+    if(motor_control_handle == NULL)
+    {
+        xTaskCreate(motorControl, "motor_control", configMINIMAL_STACK_SIZE * 3, NULL, 5, &motor_control_handle);
+    }
+
 
     if(dht_test_handle == NULL)
     {
-        xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 3, NULL, 5, &dht_test_handle);
+        xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
     }
 
 }

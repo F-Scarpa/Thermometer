@@ -1,6 +1,7 @@
 idf_component_register(SRCS  
                         "traffic_light.c" 
                         "dht_read.c"
+                        "motor_control.c"
                     INCLUDE_DIRS 
                         "."
                     REQUIRES 

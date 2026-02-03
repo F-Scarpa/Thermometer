@@ -5,6 +5,7 @@
 #include "dht_read.h"
 #include "helper.h"
 #include "cJSON.h"
+#include "esp_log.h"
 
 void send_JSON_num(int num)     //send data as JSON
 {
@@ -29,13 +30,17 @@ void high_temp_alarm(int16_t measure, uint8_t threshold)
 }
 
 
+
+//file task
 void dht_test(void *pvParameters)
 {
     float temperature, humidity;
     uint8_t debug_aug = 10;
 
     while (1)
-    {
+    {   
+        UBaseType_t free = uxTaskGetStackHighWaterMark(NULL);
+        printf("STACK FREE: %u\n", free);
         //read temperature and humidity
         if (dht_read_float_data(SENSOR_TYPE, CONFIG_EXAMPLE_DATA_GPIO, &humidity, &temperature) == ESP_OK)
             printf("Humidity: %0.f%% Temp: %0.fC\n", humidity, temperature);
