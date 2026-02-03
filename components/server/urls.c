@@ -2,6 +2,7 @@
 #include "esp_log.h"
 #include <string.h>
 #include <stdio.h>
+#include "freertos/semphr.h"   
 
 
 static const char *TAG = "SERVER";
@@ -108,10 +109,21 @@ esp_err_t on_default_url(httpd_req_t *req)
 //-----------------------default url-----------------------//
 
 //what happen when on_disable_mode_url is visited/called
+
 esp_err_t on_disable_mode_url(httpd_req_t *req)
  {
+  HttpCommand_t cmd;    //<----------------
   //mode = 0;
-  //printf("mode is: %d\n",mode);
+  cmd.motor_mode = 5;
+  BaseType_t ok = xQueueSend( motor_c_data, &cmd, 1000/portTICK_PERIOD_MS); //<---------------
+
+  if(ok == pdTRUE){
+    printf("disable mode queued\n");
+  }
+  else{
+    printf("Failed to queue disable mode\n");
+  }
+  
   httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
   httpd_resp_send(req,NULL,0);                      //send http status
   return ESP_OK;

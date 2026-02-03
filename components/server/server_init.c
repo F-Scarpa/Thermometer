@@ -30,6 +30,14 @@ void init_server()     // can be used to store paths
 
 
   //endpoints
+  
+  httpd_uri_t disable_mode_url = {
+      .uri = "/api/disable",         
+      .method = HTTP_GET,
+      .handler = on_disable_mode_url    
+    };
+  httpd_register_uri_handler(server, &disable_mode_url);    
+
 
   /*
   httpd_uri_t disable_mode_url = {

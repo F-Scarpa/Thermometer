@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"  
+#include "driver/gpio.h" 
+#include "freertos/semphr.h"       
 
 #include "nvs_flash.h"   
 #include "secrets.h"
@@ -19,6 +20,7 @@
 #include "pinsSetup.h"
 #include "dht_read.h"
 #include "motor_control.h"
+#include "urls.h"
 
 
 
@@ -29,6 +31,10 @@
 //TaskHandle_t traffic_handle = NULL;
 TaskHandle_t dht_test_handle = NULL;
 TaskHandle_t motor_control_handle = NULL;
+
+//queue handlers
+QueueHandle_t motor_c_data = NULL;      //global rtos resouces (queue)
+
 
 /*
 if (traffic_handle)             //if task has been created delete it and reset value
@@ -66,15 +72,17 @@ void app_main(void)
 
     
     //motorControl();
+    motor_c_data = xQueueCreate(10, sizeof(HttpCommand_t));     //create queue before using it
+    //check for motor_control task
     if(motor_control_handle == NULL)
     {
-        xTaskCreate(motorControl, "motor_control", configMINIMAL_STACK_SIZE * 3, NULL, 5, &motor_control_handle);
+       xTaskCreate(motorControl, "motor_control", configMINIMAL_STACK_SIZE * 3, NULL, 5, &motor_control_handle);
     }
 
 
     if(dht_test_handle == NULL)
     {
-        xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
+       //xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
     }
 
 }

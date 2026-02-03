@@ -11,7 +11,7 @@
 #include "freertos/event_groups.h"  //library to use event groups
 
 
-//event group = multiple events => listen for both ble and http, only after i got both a tast can run
+//event group = multiple events => listen for both ble and http, only after i got both a task can run
 EventGroupHandle_t evtGrp;        //event group handler
 
     const int gotHTTP = (1 << 0);           //check if triggered

@@ -5,6 +5,7 @@
 #include "driver/gpio.h"  
 #include "pinsSetup.h"
 #include "driver/ledc.h"
+#include "urls.h"
 
 void pwm_init(){
   ledc_timer_config_t timer = {
@@ -36,11 +37,25 @@ void pwm_init(){
 }
 
 
-void motorControl(void *pvParameters){
+
+
+
+void motorControl(void *pvParameters){      //task receiving queue
+    HttpCommand_t rxCmd;        //received Cmd, struct we defined in the handler methos (which sends data in the queue)
     while(1)            //tasks always need loop and a delay
     {
-        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 50);
-        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        if(xQueueReceive(motor_c_data, &rxCmd, portMAX_DELAY))      //when data from queue is read
+        {
+            printf("Read data from queue %d\n", rxCmd.motor_mode);
+            if(rxCmd.motor_mode == 5)
+            {
+                ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 250);
+                ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+                printf("OK");
+            }
+        }
+
+
 
         vTaskDelay(pdMS_TO_TICKS(100));
     }

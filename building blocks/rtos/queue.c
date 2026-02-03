@@ -16,14 +16,15 @@ QueueHandle_t queue;    //declare a new queue handler
 
 
 
-void task_ListenForHTTP(void *params)                   
+void task_ListenForHTTP(void *params)     //working task              
 {
     int counter = 0;        
     while(true)
     {
         counter++;
         printf("Received http data\n");
-        long ok = xQueueSend( queue, &counter, 1000/portTICK_PERIOD_MS);      //return true if data is pushed in the queue
+        //send queue 
+        long ok = xQueueSend( queue, &counter, 1000/portTICK_PERIOD_MS);      //return true if data is pushed in the queue  
                                                                     //params:
                                                                     //queue handler
                                                                     //&var
