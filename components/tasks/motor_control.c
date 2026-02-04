@@ -42,14 +42,25 @@ void pwm_init(){
 
 void motorControl(void *pvParameters){      //task receiving queue
     HttpCommand_t rxCmd;        //received Cmd, struct we defined in the handler methos (which sends data in the queue)
+
+    /*
+    
+    typedef struct      
+    {
+    int motor_mode;
+    } HttpCommand_t;
+
+    */
+
     while(1)            //tasks always need loop and a delay
     {
-        if(xQueueReceive(motor_c_data, &rxCmd, portMAX_DELAY))      //when data from queue is read
+        if(xQueueReceive(motor_c_data, &rxCmd, portMAX_DELAY))      //check for queue data, must be created before use
+                                                                    //with var = xQueueCreate(10, sizeof(HttpCommand_t));
         {
-            printf("Read data from queue %d\n", rxCmd.motor_mode);
-            if(rxCmd.motor_mode == 5)
+            printf("Read data from queue %d\n", rxCmd.motor_mode);  //on queue received
+            if(rxCmd.motor_mode == 0)       //read value 5 setted by the queue sender, url-callback from http
             {
-                ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 250);
+                ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
                 ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
                 printf("OK");
             }

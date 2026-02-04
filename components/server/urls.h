@@ -15,7 +15,7 @@ esp_err_t on_WEB_SOCKET_url(httpd_req_t *req);
 esp_err_t send_ws_message(char* message);
 
 
-typedef struct
+typedef struct      //struct to send to queue
 {
   int motor_mode;
 } HttpCommand_t;

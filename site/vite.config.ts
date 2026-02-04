@@ -7,11 +7,11 @@ export default defineConfig({
   server:{
     proxy:{
       "/api":{
-        target: "http://my-esp32.local",
+        target: "http://thermo.local",
         "changeOrigin":true
       },
       "/ws": {
-        target: "http://my-esp32.local",
+        target: "http://thermo.local",
         ws:true
       }
     },

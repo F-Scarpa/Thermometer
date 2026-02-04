@@ -112,11 +112,12 @@ esp_err_t on_default_url(httpd_req_t *req)
 
 esp_err_t on_disable_mode_url(httpd_req_t *req)
  {
-  HttpCommand_t cmd;    //<----------------
-  //mode = 0;
-  cmd.motor_mode = 5;
-  BaseType_t ok = xQueueSend( motor_c_data, &cmd, 1000/portTICK_PERIOD_MS); //<---------------
+  HttpCommand_t cmd;    //extract struct created in header file
 
+  cmd.motor_mode = 0; //modify value
+  BaseType_t ok = xQueueSend( motor_c_data, &cmd, 1000/portTICK_PERIOD_MS); //send data in queue (&cmd), the whole struct
+
+  //ok respond as pdTrue or pdFalse
   if(ok == pdTRUE){
     printf("disable mode queued\n");
   }

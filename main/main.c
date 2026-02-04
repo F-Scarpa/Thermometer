@@ -72,7 +72,7 @@ void app_main(void)
 
     
     //motorControl();
-    motor_c_data = xQueueCreate(10, sizeof(HttpCommand_t));     //create queue before using it
+    motor_c_data = xQueueCreate(10, sizeof(HttpCommand_t));     //create queue before using it (used in motor_control task)
     //check for motor_control task
     if(motor_control_handle == NULL)
     {
@@ -82,7 +82,7 @@ void app_main(void)
 
     if(dht_test_handle == NULL)
     {
-       //xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
+       xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
     }
 
 }

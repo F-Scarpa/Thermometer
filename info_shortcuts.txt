@@ -22,7 +22,9 @@ npm create vite@latest
 cd site
 npm install
 npm run build
-npm run dev
+////// to work on frontend quickly:
+vite.config.ts > target your mdns name > npm run dev 
+
 
 //add partition:
 # Name,   Type, SubType, Offset,  Size, Flags
