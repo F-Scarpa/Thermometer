@@ -2,10 +2,16 @@
 #include "esp_log.h"
 #include <string.h>
 #include <stdio.h>
-#include "freertos/semphr.h"   
+#include "freertos/semphr.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"   
+//#include "dht_read.h"
 
 
 static const char *TAG = "SERVER";
+extern uint16_t high_temp_threshold;
+
+//extern TaskHandle_t dht_test_handle;
 
 //------------------------websocket------------------------//
 #define WS_MAX_SIZE 1024
@@ -123,6 +129,74 @@ esp_err_t on_disable_mode_url(httpd_req_t *req)
   }
   else{
     printf("Failed to queue disable mode\n");
+  }
+  
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,0);                      //send http status
+  return ESP_OK;
+ }
+
+
+
+//auto mode
+ esp_err_t on_auto_mode_url(httpd_req_t *req)
+ {
+  HttpCommand_t cmd;    //extract struct created in header file
+
+  cmd.motor_mode = 1; //modify value
+  BaseType_t ok = xQueueSend( motor_c_data, &cmd, 1000/portTICK_PERIOD_MS); //send data in queue (&cmd), the whole struct
+
+  //ok respond as pdTrue or pdFalse
+  if(ok == pdTRUE){
+    printf("auto mode queued\n");
+  }
+  else{
+    printf("failed to queue auto mode\n");
+  }
+  
+  httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+  httpd_resp_send(req,NULL,0);                      //send http status
+  return ESP_OK;
+ }
+
+ esp_err_t on_set_threshold_mode_url(httpd_req_t *req)
+ {
+    char buf[100];
+    memset(&buf,0, sizeof(buf));                         //clean buffer
+    int ret = httpd_req_recv(req, buf, req->content_len);   //write inside buffer and save it to a int variable
+    if (ret > 0) {
+        int new_threshold = atoi(buf);
+        high_temp_threshold = new_threshold;  
+        printf("new high threshold : %d\n",high_temp_threshold);
+/*
+        if (dht_test_handle != NULL)
+        {
+            xTaskNotify(dht_test_handle,DHT_CMD_UPDATE | DHT_CMD_RESET,eSetBits);   //send update and reset to dht_test_handle's task (dht_read)
+                                                                                    //2. data to send = DHT_CMD_UPDATE | DHT_CMD_RESET = 00000011
+        }*/
+        
+        httpd_resp_send(req, "OK", 2);
+
+    }
+
+    return ESP_OK;
+ }
+
+
+ //man mode
+  esp_err_t on_man_mode_url(httpd_req_t *req)
+ {
+  HttpCommand_t cmd;    //extract struct created in header file
+
+  cmd.motor_mode = 2; //modify value
+  BaseType_t ok = xQueueSend( motor_c_data, &cmd, 1000/portTICK_PERIOD_MS); //send data in queue (&cmd), the whole struct
+
+  //ok respond as pdTrue or pdFalse
+  if(ok == pdTRUE){
+    printf("man mode queued\n");
+  }
+  else{
+    printf("failed to queue man mode\n");
   }
   
   httpd_resp_set_status(req,"204 NO CONTENT");      //set http status

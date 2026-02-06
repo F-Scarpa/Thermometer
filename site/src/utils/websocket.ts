@@ -26,7 +26,7 @@
         onDataReceived(esp32Data);      //webSocket((data: ESP32Data)=> {setTemp(data.temperature);});  (in effects.ts)
         }
       catch (error) {
-        console.error("Errore parsing JSON:", error);
+        console.error("error parsing JSON:", error);
 
       }
     }

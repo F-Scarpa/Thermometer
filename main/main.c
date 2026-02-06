@@ -25,7 +25,7 @@
 
 
 //volatile int mode = 0;
-//volatile int vehicle_tra_lig_state = 0;
+
 
 //task handlers
 //TaskHandle_t traffic_handle = NULL;
@@ -79,10 +79,10 @@ void app_main(void)
        xTaskCreate(motorControl, "motor_control", configMINIMAL_STACK_SIZE * 3, NULL, 5, &motor_control_handle);
     }
 
-
+    //dht task
     if(dht_test_handle == NULL)
     {
-       xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
+      xTaskCreate(dht_test, "dht_test", configMINIMAL_STACK_SIZE * 30, NULL, 5, &dht_test_handle);
     }
 
 }

@@ -24,13 +24,59 @@ const handleClick = (num : number) => {
     setMode(num);
     console.log(mode);
 };
+
 //React.ChangeEvent<T> is the event type, <T> is the element we are working on, react inherits props like value, checked...
-const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the event. the after : is the data (event) type
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the event. the after : is the data (event) type (onChange)
     const value = Number(e.target.value)    //value is inherited by HTMLInputElements which tells react it's a input
     setThreshold(value);
     console.log(e.target.value);
 };
 
+
+//post
+async function setThresholdCall(newThreshold : number) {
+  try {
+    const response = await fetch("/api/threshold", 
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: newThreshold.toString(), 
+    });
+
+    if (response.ok) {
+      await response.text();
+      //console.log("ESP32 response:", text);
+      console.log(`new threshold is : ${newThreshold}`);
+    } else {
+      console.error("HTTP error", response.status);
+    }
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
+}
+
+const auto_mode = async () =>     
+  {                                                                         
+    const webResult = await fetch("/api/auto");  
+    console.log(webResult);
+
+  }
+
+const man_mode = async () =>     
+  {                                                                         
+    const webResult = await fetch("/api/man");  
+    console.log(webResult);
+
+  }
+
+const off_mode = async () =>     
+  {                                                                         
+    const webResult = await fetch("/api/disable");  
+    console.log(webResult);
+
+  }
 
   
 
@@ -42,9 +88,17 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the
       <h2>Ora: {currentTime}</h2>
       <h2>Temperature: {temp !== null ? `${temp} °C `: 'calculating temperature...'}</h2>
       <h2>Mode: </h2>
-      <button onClick={() => handleClick(0)}>Off</button>
-      <button onClick={() => handleClick(1)}>Man</button>
-      <button onClick={() => handleClick(2)}>Auto</button>
+      <button onClick={() => {handleClick(0);
+                              off_mode();
+      }}>Off</button>
+
+      <button onClick={() => {handleClick(1);
+                              man_mode()
+      }}>Man</button>
+
+      <button onClick={() => {handleClick(2);
+                             auto_mode()
+      }}>Auto</button>
 
     <div style={{
                   display:"block",
@@ -53,9 +107,9 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the
       <button style={mode === 1? {display:"inline"} : {display:"none"}}>Start/Stop</button>
       <button style={mode ===1? {display:"inline"}: {display:"none"}}>Push</button>
 
-      <span style={{display : mode === 2? "inline" : "none"}}>20</span>
+      <span style={{display : mode === 2? "inline" : "none"}}>0</span>
       <input type='range'
-             min={20}
+             min={0}
              max={100}
              value={threshold}
              onChange={handleChange}
@@ -69,7 +123,8 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the
                       
       }
               
-      }>Set threshold</button>
+      }
+      onClick={()=> setThresholdCall(threshold)}>Set threshold</button>
 
     </div>
 

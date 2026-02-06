@@ -6,6 +6,43 @@
 #include "pinsSetup.h"
 #include "driver/ledc.h"
 #include "urls.h"
+#include "dht_read.h"
+
+
+extern float temperature;
+extern uint16_t high_temp_threshold;
+uint8_t mode = 0;
+
+
+void soft_starter(uint16_t *motor_speed, uint8_t pwm_duty)
+{
+    if (*motor_speed < 1023 - pwm_duty)
+    {
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, *motor_speed);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        (*motor_speed) += pwm_duty;
+        printf("%d\n",*motor_speed);
+    }
+}
+
+void soft_stop(uint16_t *motor_speed, uint8_t pwm_duty)
+{
+    if(*motor_speed < pwm_duty)
+    {
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, *motor_speed);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+    }
+
+    if (*motor_speed > 0)
+    {
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, *motor_speed);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        (*motor_speed) -= pwm_duty;
+        printf("%d\n",*motor_speed);
+    }
+}
+
+
 
 void pwm_init(){
   ledc_timer_config_t timer = {
@@ -51,20 +88,56 @@ void motorControl(void *pvParameters){      //task receiving queue
     } HttpCommand_t;
 
     */
+    static uint16_t motor_speed_shared = 0; 
 
     while(1)            //tasks always need loop and a delay
     {
-        if(xQueueReceive(motor_c_data, &rxCmd, portMAX_DELAY))      //check for queue data, must be created before use
+
+        if(xQueueReceive(motor_c_data, &rxCmd, 0) == pdTRUE)      //check for queue data, must be created before use, 0) ==pdTrue makes the queue not blocking
                                                                     //with var = xQueueCreate(10, sizeof(HttpCommand_t));
         {
-            printf("Read data from queue %d\n", rxCmd.motor_mode);  //on queue received
-            if(rxCmd.motor_mode == 0)       //read value 5 setted by the queue sender, url-callback from http
+            printf( "%0.f\n", temperature);  //on queue received
+            //off
+            if(rxCmd.motor_mode == 0)       //read value 0 setted by the queue sender, url-callback from http
             {
                 ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
                 ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-                printf("OK");
+                printf("disabled from motor_control\n");
+                mode = 0;
+            }
+            //auto
+            else if (rxCmd.motor_mode == 1)      
+            {
+                printf("auto from motor_control\n");
+                mode = 1;
+
+            }
+            //man
+            else if (rxCmd.motor_mode == 2)      
+            {
+                ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 0);
+                ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+                printf("man from motor_control\n");
             }
         }
+
+        //logic
+        if (mode == 1)      //auto mode
+        {
+            //printf("%d\n",high_temp_threshold);
+            if(temperature > high_temp_threshold)
+            {
+                soft_starter(&motor_speed_shared, 20);
+                //ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 250);
+                //ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+            }
+
+            if(temperature <= high_temp_threshold - 5)
+            {   
+                soft_stop(&motor_speed_shared, 20);
+            }
+        }
+        
 
 
 
