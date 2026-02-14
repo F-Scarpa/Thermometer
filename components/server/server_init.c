@@ -36,23 +36,14 @@ void init_server()     // can be used to store paths
     };
   httpd_register_uri_handler(server, &disable_mode_url);    
 
-//auto mode
+////////////auto mode
    httpd_uri_t auto_mode_url = {
       .uri = "/api/auto",         
       .method = HTTP_GET,
       .handler = on_auto_mode_url    
     };
-  httpd_register_uri_handler(server, &auto_mode_url);    
-
-
-//auto mode
-   httpd_uri_t man_mode_url = {
-      .uri = "/api/man",         
-      .method = HTTP_GET,
-      .handler = on_man_mode_url    
-    };
-  httpd_register_uri_handler(server, &man_mode_url);    
-
+  httpd_register_uri_handler(server, &auto_mode_url);   
+  
 //set threshold
    httpd_uri_t set_threshold_url = {
       .uri = "/api/threshold",         
@@ -60,6 +51,23 @@ void init_server()     // can be used to store paths
       .handler = on_set_threshold_mode_url    
     };
   httpd_register_uri_handler(server, &set_threshold_url);    
+
+
+
+//////////man mode
+   httpd_uri_t man_mode_url = {
+      .uri = "/api/man",         
+      .method = HTTP_GET,
+      .handler = on_man_mode_url    
+    };
+  httpd_register_uri_handler(server, &man_mode_url);    
+
+  httpd_uri_t toggle_mode_url = {
+      .uri = "/api/toggle",         
+      .method = HTTP_GET,
+      .handler = on_toggle_mode_url    
+    };
+  httpd_register_uri_handler(server, &toggle_mode_url);  
 
 
 

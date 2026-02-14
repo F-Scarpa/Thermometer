@@ -7,7 +7,9 @@ import type { ESP32Data } from './utils/websocket';   //typescript use verbatimM
 export const timeEffects = () => {
     const [currentTime, setCurrentTime] = useState(getCurrentTime());
     const [currentDate, setCurrentDate] = useState(getCurrentDate());
+
     const [temp, setTemp] = useState<number | null>(null);                  //when temp isn't defined it is null
+
 
   //update every day
   useEffect(() => {
@@ -30,6 +32,7 @@ export const timeEffects = () => {
   useEffect(() => {
     const socket = webSocket((data: ESP32Data) => {
       setTemp(data.temperature);  //this is onDataReceived, set temperature to data.temperature data is the parameter interface 
+
       });
 
     return () => {

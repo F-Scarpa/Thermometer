@@ -24,7 +24,7 @@
 
 
 
-//volatile int mode = 0;
+
 
 
 //task handlers
@@ -35,21 +35,7 @@ TaskHandle_t motor_control_handle = NULL;
 //queue handlers
 QueueHandle_t motor_c_data = NULL;      //global rtos resouces (queue)
 
-
-/*
-if (traffic_handle)             //if task has been created delete it and reset value
-    {
-        vTaskDelete(traffic_handle);            //kill task
-        traffic_handle = NULL;                  //remove old values from task
-    }
-
-
-if(traffic_handle == NULL)              //only create task if doesn't exist
-    {
-        xTaskCreate(&traffic_light_cycle,"traffic_light_cycle",2048, NULL, 2, &traffic_handle);     //this will call the defined task using &object as arguments
-    }   
-*/
-
+SemaphoreHandle_t toggle_led_semaphore; 
 
 
 void app_main(void)
@@ -73,8 +59,12 @@ void app_main(void)
     
     //motorControl();
     motor_c_data = xQueueCreate(10, sizeof(HttpCommand_t));     //create queue before using it (used in motor_control task)
+
+    //toggle led semaphore for toggle led API call
+    toggle_led_semaphore = xSemaphoreCreateBinary();
+
     //check for motor_control task
-    if(motor_control_handle == NULL)
+    if(motor_control_handle == NULL)        //task created only once and never killed
     {
        xTaskCreate(motorControl, "motor_control", configMINIMAL_STACK_SIZE * 3, NULL, 5, &motor_control_handle);
     }

@@ -114,8 +114,8 @@ esp_err_t on_default_url(httpd_req_t *req)
 
 //-----------------------default url-----------------------//
 
-//what happen when on_disable_mode_url is visited/called
 
+//what happen when on_disable_mode_url is visited/called
 esp_err_t on_disable_mode_url(httpd_req_t *req)
  {
   HttpCommand_t cmd;    //extract struct created in header file
@@ -168,12 +168,7 @@ esp_err_t on_disable_mode_url(httpd_req_t *req)
         int new_threshold = atoi(buf);
         high_temp_threshold = new_threshold;  
         printf("new high threshold : %d\n",high_temp_threshold);
-/*
-        if (dht_test_handle != NULL)
-        {
-            xTaskNotify(dht_test_handle,DHT_CMD_UPDATE | DHT_CMD_RESET,eSetBits);   //send update and reset to dht_test_handle's task (dht_read)
-                                                                                    //2. data to send = DHT_CMD_UPDATE | DHT_CMD_RESET = 00000011
-        }*/
+
         
         httpd_resp_send(req, "OK", 2);
 
@@ -202,6 +197,16 @@ esp_err_t on_disable_mode_url(httpd_req_t *req)
   httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
   httpd_resp_send(req,NULL,0);                      //send http status
   return ESP_OK;
+ }
+
+
+ esp_err_t on_toggle_mode_url(httpd_req_t *req)
+ {
+    printf("toggle mode called\n");
+    xSemaphoreGive(toggle_led_semaphore);
+    httpd_resp_set_status(req,"204 NO CONTENT");      //set http status
+    httpd_resp_send(req,NULL,0);                      //send http status
+    return ESP_OK;
  }
 
  

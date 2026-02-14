@@ -3,12 +3,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "dht_read.h"
-#include "helper.h"
+#include "helper.h"     //helper import the send_ws_message
 #include "cJSON.h"
 #include "esp_log.h"
 
 float temperature = 0;
-volatile uint16_t high_temp_threshold = 0;
+volatile uint16_t high_temp_threshold = 35;
 
 void send_JSON_num(int num)     //send data as JSON
 {
@@ -20,8 +20,7 @@ void send_JSON_num(int num)     //send data as JSON
     send_ws_message(message);               
     //free heap memory
     cJSON_Delete(payload);     
-    free(message); 
-    
+    free(message);    
 }
 
 //function to set high alarm threshold
@@ -37,7 +36,7 @@ static void high_temp_alarm(int16_t measure, uint8_t threshold)
 //file task
 void dht_test(void *pvParameters)
 {
-    uint32_t cmd;  //notification buffer, it can store up to 32 different commands (32bits)
+   
 
     float humidity;
     
@@ -45,25 +44,14 @@ void dht_test(void *pvParameters)
     while (1)
     {   
 
-      /* if (xTaskNotifyWait(0, ULONG_MAX, &cmd , 0) == pdTRUE)      //0, ULONG_MAX = delete all bits after reading, resetting the message
-        {
-            // 00000011 & 00000001 = 00000001 check if both bytes have same value, only the LSB have 1+1
-            if (cmd & DHT_CMD_RESET)            
-            {
-                printf("DHT reset\n");
-            }
 
-            if (cmd & DHT_CMD_UPDATE)
-            {
-                printf("Threshold updated: %d\n", high_temp_threshold);
-            }
-        }*/
 
         UBaseType_t free = uxTaskGetStackHighWaterMark(NULL);
-        //printf("STACK FREE: %u\n", free);
+        printf("STACK FREE: %u\n", free);
         //read temperature and humidity
         if (dht_read_float_data(SENSOR_TYPE, CONFIG_EXAMPLE_DATA_GPIO, &humidity, &temperature) == ESP_OK)
             //printf("Humidity: %0.f%% Temp: %0.fC\n", humidity, temperature);
+            //printf( "%0.f\n", temperature); 
             {}
         else
             printf("Could not read data from sensor\n");

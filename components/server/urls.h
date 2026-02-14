@@ -4,6 +4,7 @@
 
 extern httpd_handle_t server;
 extern QueueHandle_t motor_c_data;
+extern SemaphoreHandle_t toggle_led_semaphore;
 
 
 esp_err_t on_default_url(httpd_req_t *req);
@@ -15,6 +16,7 @@ esp_err_t on_auto_mode_url(httpd_req_t *req);
 esp_err_t on_set_threshold_mode_url(httpd_req_t *req);
 
 esp_err_t on_man_mode_url(httpd_req_t *req);
+ esp_err_t on_toggle_mode_url(httpd_req_t *req);
 
 esp_err_t on_WEB_SOCKET_url(httpd_req_t *req);
 esp_err_t send_ws_message(char* message);

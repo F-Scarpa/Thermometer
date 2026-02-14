@@ -1,5 +1,8 @@
+  //struct to collect all variables to send with websocket
   export interface ESP32Data {  //data structure (interface) called ESP32Data
     temperature: number;
+    toggleState : boolean;
+ 
   }
 
 
@@ -10,7 +13,7 @@
   }
 
 
-  export const webSocket = (onDataReceived: (data : ESP32Data) => void) =>    
+  export const webSocket = (onDataReceived: (data : ESP32Data) => void) =>    //onDataReceived is a callback func retrun void and accept esp32Data as parameter
   {
     const socket = new WebSocket(getWebSocketUrl("ws"));    //create new websocket
     socket.onopen = () =>        //on opened websocket
@@ -22,8 +25,11 @@
       console.log(event.data);    //event.data is data the server received
       try{
         const esp32Data : ESP32Data = JSON.parse(event.data);  
-        console.log(esp32Data.temperature);
+        //console.log(esp32Data.temperature);
+        //console.log(esp32Data.toggleState);
         onDataReceived(esp32Data);      //webSocket((data: ESP32Data)=> {setTemp(data.temperature);});  (in effects.ts)
+
+
         }
       catch (error) {
         console.error("error parsing JSON:", error);

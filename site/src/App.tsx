@@ -14,9 +14,11 @@ function App() {
   //const [colorNum, setColorNum] = useState(0);
   const {currentTime, currentDate, temp} = timeEffects();
   const [mode,setMode] = useState(0);
-  const [threshold, setThreshold] = useState(20);
+  const [threshold, setThreshold] = useState(35);
+  const [toggleState, setToggleState] = useState(false);
+  const [currentThreshold, setCurrentThreshold] = useState(35);
   
- 
+
 
 
 
@@ -24,6 +26,24 @@ const handleClick = (num : number) => {
     setMode(num);
     console.log(mode);
 };
+
+
+const handleToggleActuator = (state : number) => {
+  if(state === 2)
+  {
+    setToggleState(!toggleState);
+  }
+  else if(state === 0)
+  {
+    setToggleState(false);
+  }
+  else if(state === 1)
+  {
+    setToggleState(true);
+  }
+    //console.log(mode);
+};
+
 
 //React.ChangeEvent<T> is the event type, <T> is the element we are working on, react inherits props like value, checked...
 const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the event. the after : is the data (event) type (onChange)
@@ -35,6 +55,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    //e is the
 
 //post
 async function setThresholdCall(newThreshold : number) {
+  setCurrentThreshold(newThreshold);
   try {
     const response = await fetch("/api/threshold", 
       {
@@ -57,18 +78,26 @@ async function setThresholdCall(newThreshold : number) {
   }
 }
 
+//gets
 const auto_mode = async () =>     
   {                                                                         
     const webResult = await fetch("/api/auto");  
     console.log(webResult);
-
   }
+
+
 
 const man_mode = async () =>     
   {                                                                         
     const webResult = await fetch("/api/man");  
     console.log(webResult);
+  }
 
+const toggle_actuator = async (state : number) =>     
+  {                                                                         
+    const webResult = await fetch("/api/toggle");  
+    handleToggleActuator(state);
+    console.log(webResult);
   }
 
 const off_mode = async () =>     
@@ -104,10 +133,14 @@ const off_mode = async () =>
                   display:"block",
                   marginTop:"30px"
                 }}>
-      <button style={mode === 1? {display:"inline"} : {display:"none"}}>Start/Stop</button>
-      <button style={mode ===1? {display:"inline"}: {display:"none"}}>Push</button>
+      <button style={mode === 1? {display:"inline"} : {display:"none"}}
+              onClick={() => toggle_actuator(2)}> {toggleState ? "Stop" : "Start"}</button>
+      <button style={mode ===1? {display:"inline"}: {display:"none"}}
 
-      <span style={{display : mode === 2? "inline" : "none"}}>0</span>
+              onMouseDown={() => toggle_actuator(1)}
+              onMouseUp={() => toggle_actuator(0)}>Push</button>
+
+      <span style={{display : mode === 2? "inline" : "none"}}>{threshold}</span>
       <input type='range'
              min={0}
              max={100}
@@ -122,9 +155,16 @@ const off_mode = async () =>
                       display : mode === 2? "inline" : "None",
                       
       }
-              
+             
       }
       onClick={()=> setThresholdCall(threshold)}>Set threshold</button>
+
+      <br></br>
+      <h3 style={{display : mode === 2? "block" : "none"}} >Current Threshold is : {currentThreshold}</h3>
+
+
+
+
 
     </div>
 
